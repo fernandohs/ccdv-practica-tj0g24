@@ -323,8 +323,8 @@ dialog .row{justify-content:flex-end;margin-top:20px}
   .appbar .wrap{flex-wrap:wrap;gap:8px 12px;padding-top:10px;padding-bottom:10px}
   .brand{flex:1}
   .lang{order:2;margin-left:0}
-  .tabs{order:3;flex-basis:100%;margin:0;display:grid;grid-template-columns:repeat(3,1fr)}
-  .tab{padding:6px 4px}
+  .tabs{order:3;flex-basis:100%;margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .tab{padding:8px 4px;white-space:normal;min-height:40px;line-height:1.2}
   .lg-only{display:none} .sm-only{display:inline}
   main{padding:20px 0 64px}
   .home-top{grid-template-columns:1fr}
@@ -478,6 +478,42 @@ mark.kw{background:var(--warning-bg);color:inherit;padding:0 3px;border-radius:4
 .optwrap.struck .opt{opacity:.5;border-style:dashed}
 .optwrap.struck .opt > span:last-child{text-decoration:line-through;text-decoration-thickness:1.5px}
 .optwrap.struck .strike{opacity:1;color:var(--foreground)}
+.concept-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin:0 0 16px}
+.concept-tools .field{display:flex;flex-direction:column;gap:4px;flex:1 1 200px;min-width:0}
+.concept-tools label{font-size:.8rem;font-weight:600;color:var(--foreground)}
+#conceptSearch{width:100%;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--background);color:var(--foreground)}
+.concept-tools .btn{min-height:40px;height:auto;white-space:normal;text-align:center}
+.concept-tools .btn.ghost[aria-pressed="true"]{border-color:var(--foreground)}
+.cdom{margin:0 0 12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+.cacc{width:100%;display:flex;align-items:center;gap:8px;min-height:40px;padding:12px 16px;border:0;background:transparent;color:var(--foreground);cursor:pointer;text-align:left;border-radius:var(--radius)}
+.cacc .cname{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;min-width:0}
+.cacc .cen{color:var(--muted-fg);font-weight:500;font-size:.875rem}
+.cwt{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;color:var(--foreground)}
+.cacc svg{flex:0 0 auto;transition:transform .2s ease}
+.cacc[aria-expanded="true"] svg{transform:rotate(180deg)}
+.cpanel{display:grid;grid-template-rows:0fr;opacity:0;overflow:hidden;transition:grid-template-rows .2s ease,opacity .2s ease}
+.cpanel.is-open{grid-template-rows:1fr;opacity:1}
+.cpanelin{overflow:hidden;min-height:0}
+.cdom > .cpanel > .cpanelin{padding:0 12px}
+.cdom > .cpanel > .cpanelin > .cskill:last-child{margin-bottom:20px}
+.cskill{margin:0 0 8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--background)}
+.cskill .cacc{padding:10px 12px}
+.cskill .cpanelin{padding:0 12px}
+.cskill .cpanelin > .cpart:last-child{margin-bottom:22px}
+.cpart{margin:0 0 10px}
+.cpart h4{margin:0 0 4px;font-size:.8rem;font-weight:600;color:var(--foreground)}
+.cpart p{margin:0;color:var(--foreground)}
+.cpart[data-part="trap"]{padding:10px 12px;border:1px solid var(--warning-bd);background:var(--warning-bg);border-radius:var(--radius-md)}
+.glink{display:inline;padding:0 2px;border:0;background:transparent;color:var(--foreground);font:inherit;line-height:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--ring);cursor:pointer}
+#conceptGloss{margin-top:16px}
+#conceptEmpty{margin:8px 0 16px}
+body.is-zen .appbar{display:none}
+body.is-zen main{padding-top:24px}
+body.is-zen #panelConcepts{max-width:1100px;margin-inline:auto;padding-top:8px}
+body.is-zen #panelConcepts .concept-read { max-width: min(68ch, 100%); width:100%; margin-inline:auto; font-family:"Source Serif 4",Georgia,"Times New Roman",serif; line-height:1.65; font-size:1.0625rem; }
+@media (prefers-reduced-motion: reduce){
+  .cpanel,.cacc svg{transition:none}
+}
 @media (max-width:720px){ .aread{order:2;margin-left:0} .lang{order:2} }
 </style>
 <style>
@@ -493,7 +529,7 @@ mark.kw{background:var(--warning-bg);color:inherit;padding:0 3px;border-radius:4
     <button class="tab" role="tab" id="t-examen" aria-controls="v-examen"></button>
     <button class="tab" role="tab" id="t-prog" aria-controls="v-prog"></button>
     <button class="tab" role="tab" id="t-plan" aria-controls="v-plan"></button>
-    <button class="tab" role="tab" id="t-con" aria-controls="v-con"></button>
+    <button class="tab" role="tab" type="button" id="tabConcepts" aria-controls="panelConcepts"></button>
   </nav>
   <button class="btn quiet sm aread" id="aread" aria-haspopup="dialog">Aa</button>
   <div class="lang" role="group" aria-label="Idioma / Language"><button data-lang="es" aria-pressed="true">ES</button><button data-lang="en" aria-pressed="false">EN</button></div>
@@ -502,7 +538,7 @@ mark.kw{background:var(--warning-bg);color:inherit;padding:0 3px;border-radius:4
   <div id="v-examen" role="tabpanel" aria-labelledby="t-examen"></div>
   <div id="v-prog" class="wrap" role="tabpanel" aria-labelledby="t-prog" hidden></div>
   <div id="v-plan" class="wrap" role="tabpanel" aria-labelledby="t-plan" hidden></div>
-  <div id="v-con" class="wrap" role="tabpanel" aria-labelledby="t-con" hidden></div>
+  <div id="panelConcepts" class="wrap" role="tabpanel" aria-labelledby="tabConcepts" hidden></div>
 </main>
 <dialog id="dlg" aria-modal="true"></dialog>
 <script>
@@ -1385,35 +1421,120 @@ const GLOSS = [
  ["TTFT / OTPS",{es:"Tiempo hasta el primer token / tokens de salida por segundo.",en:"Time to first token / output tokens per second."}]
 ];
 const CT = {
- es:{tab:"Conceptos", h:"Guía de conceptos", p:"Resumen de lo esencial por habilidad, basado en la guía oficial del examen, la documentación de Claude y guías de la comunidad. Úsala para repasar; para estudiar a fondo, abre los enlaces de cada habilidad.", nums:"Cifras clave", numsP:"Verificadas en la documentación oficial (octubre de 2026). Pueden cambiar: confírmalas antes del examen.", trap:"Trampa típica", read:"Leer", gloss:"Glosario", filter:"Filtrar habilidades…", practice:"Practicar esta habilidad"},
- en:{tab:"Concepts", h:"Concept guide", p:"A summary of the essentials per skill, based on the official exam guide, Claude's documentation and community guides. Use it to review; to study in depth, open each skill's links.", nums:"Key numbers", numsP:"Verified against official documentation (October 2026). They can change: confirm them before the exam.", trap:"Typical trap", read:"Read", gloss:"Glossary", filter:"Filter skills…", practice:"Practice this skill"}
+ es:{tab:"Conceptos", h:"Temario oficial", p:"Dominios y habilidades de la guía CCDV-F v1.0, con el peso publicado. Cerrado hasta que lo abras.", search:"Buscar en el temario", expand:"Expandir todo", collapse:"Colapsar todo", zen:"Modo lectura", zenOff:"Salir de lectura", empty:"Nada coincide con la búsqueda.", gloss:"Glosario", parts:[["what","Qué es"],["why","Para qué se usa"],["when","Cuándo usarlo"],["whennot","Cuándo no usarlo"],["trap","Ojo en el examen"]]},
+ en:{tab:"Concepts", h:"Official syllabus", p:"Domains and skills from the CCDV-F v1.0 guide, with the published weight. Closed until you open them.", search:"Search the syllabus", expand:"Expand all", collapse:"Collapse all", zen:"Reading mode", zenOff:"Leave reading mode", empty:"Nothing matches the search.", gloss:"Glossary", parts:[["what","What it is"],["why","What it's for"],["when","When to use"],["whennot","When not to use"],["trap","Exam watch-outs"]]}
+};
+const SYL = [
+ ["1","agents","14.7",["arch","build","pat"]],
+ ["2","app","33.1",["req","life","api","swe","design","config"]],
+ ["3","cc","3.1",["cc"]],
+ ["4","eval","2.6",["dbg"]],
+ ["5","model","16.8",["llm","tech","sel","cost"]],
+ ["6","prompt","11.0",["ctx","pe","out"]],
+ ["7","sec","8.1",["aisec","guard","hooks","keys"]],
+ ["8","tools","10.6",["impl","mcp","custom"]]
+];
+const CPART = {
+ arch:{es:["Un agente elige el siguiente paso; un workflow encadena pasos ya definidos. El supervisor reparte y los subagentes ejecutan con su propio contexto.","Separa la orquestación de la ejecución cuando la tarea no cabe en un solo prompt.","Si el camino depende de resultados intermedios o hay que aislar una subtarea.","Si la secuencia es fija: un workflow es más predecible y basta.","No llames agente a un pipeline fijo ni supongas que el subagente comparte la ventana del supervisor."],en:["An agent picks the next step; a workflow chains predefined steps. A supervisor delegates and subagents run in their own context.","It separates orchestration from execution when the task does not fit one prompt.","When the path depends on intermediate results or a subtask must stay isolated.","When the sequence is fixed: a workflow is more predictable and enough.","Do not call a fixed pipeline an agent, or assume a subagent shares the supervisor's window."]},
+ build:{es:["Se arma con el Claude Agent SDK (loop, herramientas y hooks) o con un loop propio, self-hosted o alojado por Anthropic. Los hooks fijan acciones deterministas fuera del modelo.","El SDK aporta el harness; un loop propio deja el ciclo y el alojamiento en tus manos.","SDK para el harness de Claude Code; loop propio si el ciclo o el host no encajan.","No hace falta un agente para una sola llamada. Un hook no sustituye al prompt.","No confundas self-hosted con Anthropic-hosted, ni dejes en el modelo una acción que un hook debe bloquear."],en:["You build it with the Claude Agent SDK (loop, tools and hooks) or your own loop, self-hosted or Anthropic-hosted. Hooks pin deterministic actions outside the model.","The SDK supplies the harness; your own loop keeps the cycle and the host.","Use the SDK for the Claude Code harness; use your own loop when the cycle or host does not fit.","You do not need an agent for a single call. A hook does not replace the prompt.","Do not confuse self-hosted with Anthropic-hosted, or leave the model an action a hook should block."]},
+ pat:{es:["El patrón base es el tool-use loop, más memoria y una estrategia de ventana de contexto. LangGraph, Strands y PydanticAI modelan ese ciclo.","Ahorran rehacer a mano el estado, los reintentos y la orquestación.","Cuando hay herramientas, hechos que recordar o un grafo de pasos.","Un framework no mejora una respuesta única ni se elige por moda.","El framework no fija el límite de contexto ni la política de memoria."],en:["The base pattern is the tool-use loop, plus memory and a context-window strategy. LangGraph, Strands and PydanticAI model that cycle.","They spare you from hand-rolling state, retries and orchestration.","When there are tools, facts to remember or a graph of steps.","A framework does not help a one-shot answer and is not chosen because it is popular.","The framework does not set the context limit or the memory policy."]},
+ req:{es:["Traduce el problema a tareas, datos, restricciones y un criterio de éxito antes de elegir modelo o herramientas.","Un requisito mal leído produce la arquitectura equivocada aunque el código funcione.","Al inicio y cuando cambian el usuario, el riesgo o el volumen.","No sustituye el diseño técnico ni se resuelve pidiendo al modelo que adivine el alcance.","No saltes a un modelo grande ni a un agente si aún no está definido qué es correcto."],en:["Turn the problem into tasks, data, constraints and a success criterion before you pick a model or tools.","A misread requirement yields the wrong architecture even when the code runs.","At the start and whenever the user, the risk or the volume changes.","It does not replace technical design, and the model cannot guess the scope.","Do not jump to a large model or an agent before correct is defined."]},
+ life:{es:["Cubre diseñar, construir, probar, desplegar, observar y retirar el sistema, no solo el primer prompt.","Trata la app como software con vida útil, no como un chat suelto.","Con usuarios reales, cambios de modelo o prompts que evolucionan.","No impongas un ciclo pesado a un prototipo de una tarde sin usuarios.","Desplegar no es el final: sin observación no ves deriva ni costo."],en:["It covers design, build, test, deploy, observe and retire, not only the first prompt.","Treat the app as software with a lifespan, not a loose chat.","With real users, model changes or evolving prompts.","Do not lay a heavy process on an afternoon prototype with no users.","Shipping is not the end: without observation you miss drift and cost."]},
+ api:{es:["La Messages API manda system aparte y turnos user/assistant. Streaming entrega tokens al vuelo; la visión adjunta imágenes; extended thinking razona antes de responder; prompt caching reutiliza un prefijo. La Batch API (Message Batches) procesa carga grande, no urgente y más barata, en una ventana de unas 24 h. Bedrock y Vertex exponen el modelo en AWS y Google.","Cada mecanismo cambia latencia, costo o la forma de la solicitud.","Streaming para chat en vivo; batch para lotes que pueden esperar; caching si el prefijo se repite; visión si hay imagen.","Batch no es para chat en vivo. Caching no es lo mismo que batch.","No uses Batch en una conversación interactiva ni trates system como un rol dentro de messages."],en:["The Messages API sends system separately and user/assistant turns. Streaming yields tokens as they arrive; vision attaches images; extended thinking reasons first; prompt caching reuses a prefix. The Batch API (Message Batches) handles large, non-urgent, cheaper work in a window of about 24 h. Bedrock and Vertex expose the model on AWS and Google.","Each mechanism changes latency, cost or the shape of the request.","Streaming for live chat; batch for work that can wait; caching when the prefix repeats; vision when there is an image.","Batch is not for live chat. Caching is not the same as batch.","Do not use Batch for an interactive conversation, or treat system as a role inside messages."]},
+ swe:{es:["Estas apps hablan REST y JSON, a menudo en async. Un 429 es rate limit y un 529 es overloaded: se reintenta con backoff. Un 400 de validación no se reintenta igual. La versión del modelo y de la API se fija a propósito.","Muchos fallos de producción son de integración, no una ocurrencia del modelo.","En cualquier cliente, SDK o worker.","No reintentes errores de esquema o de autenticación como si fueran un 429.","429 no es 529 ni 400. Subir la temperatura no arregla un rate limit."],en:["These apps speak REST and JSON, often asynchronously. A 429 is a rate limit and a 529 means overloaded: retry with backoff. A validation 400 is not retried the same way. Model and API versions are pinned on purpose.","Many production failures are integration failures, not a whim of the model.","On any client, SDK or worker.","Do not retry schema or authentication errors as if they were a 429.","429 is not 529 and not 400. Raising temperature does not fix a rate limit."]},
+ design:{es:["Se usa desde Claude Code, Desktop, claude.ai, la API o un SDK. El diseño fija límites de contenido, el schema de salida y la higiene de la sesión.","La misma tarea pide una superficie distinta según usuario, latencia y control.","Al elegir la superficie y qué entra en cada sesión.","No acumules historial sin límite ni uses el chat web si necesitas un contrato de API.","Un chat no obliga a un agente, ni vuelve opcional el schema si otro sistema consume la salida."],en:["It is used from Claude Code, Desktop, claude.ai, the API or an SDK. Design sets content limits, the output schema and session hygiene.","The same task needs a different surface depending on user, latency and control.","When you choose the surface and what enters each session.","Do not keep unbounded history, and do not use the web chat when you need an API contract.","A chat does not force an agent, and a schema is not optional if another system consumes the output."]},
+ config:{es:["CLAUDE.md y settings.json fijan instrucciones y ajustes. El pin de la versión del modelo y el versionado de prompts evitan cambios silenciosos.","Sin eso, dos máquinas o dos días no ejecutan el mismo sistema.","En equipos, en CI y en cualquier app que deba repetirse.","No guardes credenciales en CLAUDE.md ni versiones el prompt solo dentro del chat.","Cambiar de modelo sin mover el pin y los prompts ya evaluados es un cambio de producto."],en:["CLAUDE.md and settings.json hold instructions and settings. Pinning the model version and versioning prompts stops silent changes.","Without that, two machines or two days do not run the same system.","In teams, in CI and in any app that must behave again tomorrow.","Do not store credentials in CLAUDE.md, and do not version the prompt only inside a chat.","Switching models without moving the pin and the prompts you already evaluated is a product change."]},
+ cc:{es:["Claude Code se opera con Rules, Skills, Commands, Agents, Agent Memory, slash commands, modo headless, CLAUDE.md y settings.json.","Separa lo que siempre aplica, lo que se carga bajo demanda y los agentes con contexto propio.","Al estandarizar un repo o automatizar tareas en terminal o CI.","No conviertas cada nota en un agente ni uses un skill si una rule corta basta.","CLAUDE.md no bloquea una acción destructiva: eso es un hook. Agent Memory no reemplaza esta sesión."],en:["Claude Code is operated with Rules, Skills, Commands, Agents, Agent Memory, slash commands, headless mode, CLAUDE.md and settings.json.","It separates what always applies, what loads on demand and agents with their own context.","When you standardize a repo or automate terminal or CI tasks.","Do not turn every note into an agent, or use a skill when a short rule is enough.","CLAUDE.md does not block a destructive action: that is a hook. Agent Memory does not replace this session."]},
+ dbg:{es:["Clasifica el fallo: API, herramienta, integración o salida incorrecta del modelo. Reintenta solo si el tipo lo permite y guarda la traza.","El arreglo depende de la causa.","Ante un 4xx o 5xx, un error de herramienta, un JSON inválido o una respuesta fuera de la rúbrica.","No reintentes un 400 ni corrijas un bug de tu código cambiando el prompt.","Una salida mal formada puede ser fallo de integración porque no validaste. Sepáralo del error del modelo en la traza."],en:["Classify the failure: API, tool, integration or a wrong model output. Retry only when the type allows it, and keep the trace.","The fix depends on the cause.","On a 4xx or 5xx, a tool error, invalid JSON or an answer outside the rubric.","Do not retry a 400, and do not fix a bug in your code by editing the prompt.","A malformed output can be an integration failure because you did not validate. Separate it from a model error in the trace."]},
+ llm:{es:["El modelo cuenta tokens y cabe en una ventana finita. Temperatura y sampling cambian la variedad; la salida no es determinista.","Explica costo, cortes y por qué dos llamadas difieren.","Al estimar presupuesto, depurar un corte o decidir si quieres variedad.","No subas la temperatura para que obedezca más ni para mitigar inyección. Cero no garantiza el mismo texto.","Más contexto no siempre ayuda. El no determinismo no es un defecto de la API."],en:["The model counts tokens and fits a finite window. Temperature and sampling change variety; output is not deterministic.","That explains cost, cutoffs and why two calls differ.","When you estimate budget, debug a cutoff or decide if you want variety.","Do not raise temperature to force obedience or to mitigate injection. Zero does not guarantee the same text.","More context does not always help. Non-determinism is not an API defect."]},
+ tech:{es:["El SDK se apoya en REST y no inventa otra semántica. Los websockets sirven para streaming o sesiones en vivo y no cambian las reglas de los mensajes.","Hay que saber qué capa falló: red, SDK o API.","Al elegir cliente, depurar timeouts o diseñar streaming.","No trates el SDK como otra verdad ni uses un socket para un lote Batch.","Un error del SDK a menudo es un cuerpo REST inválido, no un límite del modelo."],en:["The SDK sits on REST and does not invent another semantics. Websockets serve streaming or live sessions and do not change message rules.","You need to know which layer failed: network, SDK or API.","When you choose a client, debug timeouts or design streaming.","Do not treat the SDK as another source of truth, or use a socket for a Batch job.","An SDK error is often an invalid REST body, not a model limit."]},
+ sel:{es:["Opus, Sonnet y Haiku intercambian capacidad, costo y latencia. Una release nueva puede cambiar el comportamiento.","El modelo es una decisión de producto, no un default eterno.","Según dificultad, presupuesto y plazo, y otra vez al cambiar de release.","No digas que Haiku siempre basta ni que Opus siempre es más seguro. Un modelo más obediente puede seguir mejor una instrucción maliciosa.","El más grande no es la respuesta por defecto."],en:["Opus, Sonnet and Haiku trade capability, cost and latency. A new release can change behavior.","The model is a product decision, not a forever default.","Match difficulty, budget and deadline, and decide again when the release changes.","Do not say Haiku is always enough or that Opus is always safer. A more obedient model can follow a malicious instruction better.","The largest model is not the default answer."]},
+ cost:{es:["El presupuesto cuenta entrada, salida y razonamiento. Prompt caching ahorra si un prefijo se repite; batch ahorra en trabajo no urgente. No son lo mismo.","El costo crece por el contexto hinchado y por el modelo, no solo por el número de chats.","Prefijo estable: caching. Miles de solicitudes que pueden esperar unas 24 h: batch.","No uses caching si el prefijo cambia siempre, ni batch si la respuesta debe ser en vivo.","Caching no abarata un trabajo único; batch no baja la latencia."],en:["The budget counts input, output and reasoning. Prompt caching saves money when a prefix repeats; batch saves money on work that is not urgent. They are not the same.","Cost grows from bloated context and from the model, not only from the number of chats.","Stable prefix: caching. Thousands of requests that can wait about 24 h: batch.","Do not use caching when the prefix always changes, or batch when the answer must be live.","Caching does not cheapen a one-off job; batch does not lower latency."]},
+ ctx:{es:["La deriva y el bloat aparecen cuando el historial guarda texto que ya no sirve. Se poda, se compacta o se aísla en un subagente.","La ventana es un recurso: lo que sobra empuja instrucciones y hechos.","En sesiones largas, herramientas ruidosas o subtareas que no deben contaminar al orquestador.","Compactar pierde detalle. Un subagente no es memoria mágica.","Pegar más documentos no es ingeniería de contexto. El subagente devuelve un resumen, no el historial completo."],en:["Drift and bloat show up when history keeps text that no longer helps. You prune, compact or isolate the work in a subagent.","The window is a resource: leftover text pushes instructions and facts out.","On long sessions, noisy tools or subtasks that must not pollute the orchestrator.","Compaction drops detail. A subagent is not magic memory.","Pasting more documents is not context engineering. A subagent returns a summary, not the full history."]},
+ pe:{es:["El system prompt fija rol y reglas. Las etiquetas XML separan bloques; few-shot muestra el patrón; el prefill arranca la respuesta; chain of thought pide el razonamiento. En un contexto largo hay que decir qué importa.","Es la palanca más barata antes de cambiar de modelo o de arquitectura.","Cuando importan el formato, la política, los ejemplos o los pasos.","Una línea en el system prompt no detiene la inyección. No pidas chain of thought si extended thinking ya cubre el razonamiento.","Few-shot sesga. El prefill no valida. El contexto largo no sustituye instrucciones claras."],en:["The system prompt sets role and rules. XML tags separate blocks; few-shot shows the pattern; prefill starts the answer; chain of thought asks for the reasoning. Long context still needs you to say what matters.","It is the cheapest lever before you change model or architecture.","When format, policy, examples or steps matter.","One line in the system prompt does not stop injection. Do not ask for chain of thought when extended thinking already covers the reasoning.","Few-shot biases the answer. Prefill does not validate. Long context does not replace clear instructions."]},
+ out:{es:["Pide salida estructurada (JSON o schema) y valídala en tu código. Un texto que suena seguro puede estar mal formado o ser falso.","Quien consume la respuesta necesita forma y comprobaciones.","Siempre que otra máquina lea la respuesta.","No dispares un efecto con un JSON que no pasó el validador.","La forma garantizada no hace verdadero el contenido. Si no valida, rechaza, reintenta o escala."],en:["Ask for structured output (JSON or a schema) and validate it in your code. A confident answer can still be malformed or false.","Whatever consumes the answer needs shape and checks.","Whenever another machine will read the answer.","Do not fire an effect on JSON that failed validation.","A guaranteed shape does not make the content true. If it does not validate, reject, retry or escalate."]},
+ aisec:{es:["El contenido recuperado (web, documentos, herramientas) es no confiable: puede traer prompt injection, un jailbreak o datos personales.","Si lo mezclas con tus instrucciones, el modelo puede obedecerlo.","En flujos con recuperación, MCP, archivos de usuario o navegación.","No se mitiga subiendo la temperatura ni con una sola frase en el system prompt. Separar datos e instrucciones hace falta y no alcanza.","Un modelo más obediente puede ser más vulnerable. Los datos personales no van al prompt ni a los logs."],en:["Retrieved content (web, documents, tools) is untrusted: it can carry prompt injection, a jailbreak or personal data.","If you mix it with your instructions, the model may obey it.","On flows with retrieval, MCP, user files or browsing.","Raising temperature does not mitigate it, and one line in the system prompt is not enough. Separating data from instructions is necessary and not sufficient.","A more obedient model can be more vulnerable. Personal data does not belong in the prompt or in logs."]},
+ guard:{es:["Defensa en capas y mínimo privilegio: el modelo propone y tu sistema dispone, con permisos chicos fuera del modelo.","Un solo filtro se salta. Las capas cubren entrada, herramienta y salida.","Con efectos reales, datos sensibles o usuarios no confiables.","No des al agente credenciales de administrador para que se las arregle solo.","Un guardrail en el prompt no reemplaza un permiso que la herramienta no tiene."],en:["Defense in layers and least privilege: the model proposes and your system disposes, with small permissions outside the model.","A single filter gets bypassed. Layers cover input, tool and output.","With real side effects, sensitive data or untrusted users.","Do not hand the agent admin credentials so it can manage on its own.","A prompt guardrail does not replace a permission the tool does not have."]},
+ hooks:{es:["Un hook es lógica determinista fuera del modelo, en puntos fijos del ciclo, para permitir, bloquear o registrar. Encaja en acciones destructivas y en otros efectos que deben cumplirse siempre.","El modelo no debe ser el único freno de un borrado o un push.","Cuando una acción tiene que ocurrir o bloquearse sí o sí.","No sustituyas el prompt con un hook para el tono, ni el hook con un prompt para bloquear.","Si hay que impedir una acción peligrosa, la respuesta es un control determinista, no una instrucción más."],en:["A hook is deterministic logic outside the model, at fixed points in the cycle, to allow, block or record. It fits destructive actions and other effects that must always hold.","The model must not be the only brake on a delete or a push.","When an action must always run or always be blocked.","Do not replace the prompt with a hook for tone, or the hook with a prompt that must block.","If a dangerous action must be stopped, the answer is a deterministic control, not one more instruction."]},
+ keys:{es:["Las credenciales y las claves de acceso viven en un gestor o en el entorno, con el menor alcance posible. No van en el repo, en CLAUDE.md ni en el prompt.","Todo lo que el modelo ve puede salir en una respuesta o en un log.","Al conectar la API, un MCP o una herramienta.","No pegues una credencial temporal en el chat ni en un ejemplo del repositorio.","Rotar una credencial que sigue dentro del prompt no cierra la fuga."],en:["Credentials and access keys live in a manager or in the environment, with the smallest scope that works. They do not go in the repo, in CLAUDE.md or in the prompt.","Anything the model sees can leak in an answer or a log.","When you connect the API, an MCP server or a tool.","Do not paste a temporary credential into the chat or into a repository example.","Rotating a credential that is still inside the prompt does not close the leak."]},
+ impl:{es:["Tool use declara herramientas con JSON Schema. tool_choice indica si el modelo debe llamarlas. El resultado vuelve como tool_result ligado a su tool_use. Puede haber llamadas en paralelo. Un error de herramienta se devuelve como error.","Es el contrato para actuar en sistemas reales.","Cuando hacen falta datos o efectos que el modelo no tiene.","No declares una herramienta para un dato que ya está en el contexto. No paralelices llamadas que dependen entre sí.","Cada tool_result debe corresponder a su tool_use. Ignorar el error y seguir es un fallo de integración."],en:["Tool use declares tools with JSON Schema. tool_choice says whether the model must call them. The result comes back as a tool_result tied to its tool_use. Calls can run in parallel. A tool error is returned as an error.","It is the contract for acting on real systems.","When you need data or effects the model does not have.","Do not declare a tool for data already in context. Do not parallelize calls that depend on each other.","Each tool_result must match its tool_use. Ignoring the error and continuing is an integration failure."]},
+ mcp:{es:["Un servidor MCP expone tools, resources y prompts reutilizables entre varias apps. Los transportes habituales son stdio y sockets.","Evitas cablear la misma capacidad en cada producto.","Cuando la capacidad vive fuera de una sola app y varios clientes deben usarla.","Pegar datos en el contexto no es una herramienta viva. No montes un servidor para un script local de una sola vez.","MCP no ocurre dentro del prompt: el cliente conecta el servidor. Un resource no es una tool."],en:["An MCP server exposes tools, resources and prompts that several apps can reuse. Typical transports are stdio and sockets.","You avoid wiring the same capability into every product.","When the capability lives outside one app and several clients must use it.","Pasting data into the context is not a live tool. Do not stand up a server for a one-off local script.","MCP does not happen inside the prompt: the client connects the server. A resource is not a tool."]},
+ custom:{es:["Elige herramienta integrada, herramienta propia, Skill, servidor MCP o subagente según reutilización, estado y privilegio.","Cada opción gasta contexto y permiso de forma distinta.","Integrada si ya existe; propia si el contrato es de tu app; Skill para un procedimiento bajo demanda; MCP si varias apps lo comparten; subagente si el contexto debe ir aislado.","No crees un subagente para una función pura ni un MCP para un párrafo de instrucciones.","Una Skill no impone un efecto con permiso mínimo como un hook o una herramienta acotada."],en:["Choose a built-in tool, a custom tool, a Skill, an MCP server or a subagent by reuse, state and privilege.","Each option spends context and permission differently.","Built-in if it exists; custom if the contract is your app's; Skill for an on-demand procedure; MCP when several apps share it; subagent when the context must stay isolated.","Do not create a subagent for a pure function or an MCP server for a paragraph of instructions.","A Skill does not enforce a least-privilege effect the way a hook or a tightly scoped tool does."]}
 };
 let conFilter = "";
-function renderConcepts(){
-  const C=CT[LANG];
-  const nums=NUMS.map(r=>`<tr><td><b>${esc(L(r[0]))}</b></td><td>${esc(L(r[1]))}</td></tr>`).join("");
-  let sec="";
-  Object.keys(DW).forEach(d=>{
-    const cards=Object.keys(SK).filter(s=>SK[s].d===d).sort((a,b)=>SK[b].w-SK[a].w).filter(s=>{ if(!conFilter) return true; const x=CON[s][LANG]; return (skName(s)+" "+x.k.join(" ")+" "+x.t).toLowerCase().includes(conFilter); }).map(s=>{
-      const x=CON[s][LANG];
-      return `<div class="ccard"><div class="row spread"><h3 style="margin:0">${esc(skName(s))}</h3><span class="muted small">${SK[s].w} %</span></div>
-        <ul class="list" style="margin-top:8px">${x.k.map(k=>`<li>${esc(k)}</li>`).join("")}</ul>
-        <p class="trap"><b>${C.trap}:</b> ${esc(x.t)}</p>
-        <p class="muted small" style="margin:6px 0 0">${C.read}:</p><ul class="links">${linkList(s,3)}</ul><button class="btn ghost sm" data-practice="${s}" style="margin-top:10px">${ft("practiceSkill")}</button></div>`; }).join("");
-    if(cards) sec+=`<section><h2>${esc(L(DOM[d]))} <span class="muted small">· ${DW[d]} %</span></h2>${cards}</section>`;
+let conceptBound = false;
+function conceptState(){
+  const d = store.get("ccdvf.concepts.domains");
+  const s = store.get("ccdvf.concepts.skills");
+  const z = store.get("ccdvf.concepts.zen");
+  return {d:Array.isArray(d)?d:[], s:Array.isArray(s)?s:[], z:z===true};
+}
+function saveConceptOpen(){
+  const root=$("#panelConcepts"); if(!root) return;
+  store.set("ccdvf.concepts.domains", [...root.querySelectorAll(".cdom")].filter(n=>n.querySelector(":scope > h2 > .cacc").getAttribute("aria-expanded")==="true").map(n=>n.dataset.domain));
+  store.set("ccdvf.concepts.skills", [...root.querySelectorAll(".cskill")].filter(n=>n.querySelector(":scope > .cacc").getAttribute("aria-expanded")==="true").map(n=>n.dataset.skill));
+}
+function glossLink(raw){
+  const terms=GLOSS.map(g=>g[0]).slice().sort((a,b)=>b.length-a.length);
+  const escRe=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  const re=new RegExp("(?<![A-Za-z])(?:"+terms.map(escRe).join("|")+")(?![A-Za-z])","g");
+  return esc(raw).replace(re, m=>`<button type="button" class="glink" data-gloss="${esc(m)}">${esc(m)}</button>`);
+}
+function applyConceptFilter(){
+  const root=$("#panelConcepts"); if(!root) return;
+  const q=($("#conceptSearch").value||"").trim().toLowerCase();
+  conFilter=q;
+  let shown=0;
+  root.querySelectorAll(".cdom").forEach(dom=>{
+    let any=false;
+    dom.querySelectorAll(".cskill").forEach(card=>{
+      const hit=!q || card.textContent.toLowerCase().includes(q);
+      card.hidden=!hit; if(hit) any=true;
+    });
+    if(q && dom.querySelector(":scope > h2").textContent.toLowerCase().includes(q)){
+      dom.querySelectorAll(".cskill").forEach(c=>{ c.hidden=false; }); any=true;
+    }
+    dom.hidden=!any; if(any) shown++;
   });
-  const gl=GLOSS.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(L(g[1]))}</td></tr>`).join("");
-  $("#v-con").innerHTML=`<div class="plan">
-    <section class="page-head"><h2>${C.h}</h2><p class="sub">${C.p}</p><button class="btn" id="fcbtn" style="margin-top:6px">${ft("fcBtn")}</button></section>
-    <section><h2>${C.nums}</h2><p class="note">${C.numsP}</p><div class="tablewrap"><table class="skills rules"><tbody>${nums}</tbody></table></div></section>
-    <input id="cfilter" class="cfilter" type="search" placeholder="${C.filter}" value="${esc(conFilter)}" aria-label="${C.filter}">
-    ${sec}
-    <section><h2>${C.gloss}</h2><div class="tablewrap"><table class="skills rules"><tbody>${gl}</tbody></table></div></section>
-  </div>`;
-  addJump($("#v-con"));
-  $("#fcbtn").onclick=()=>openCards();
-  document.querySelectorAll("#v-con [data-practice]").forEach(b=>b.onclick=()=>practiceSkills([b.dataset.practice]));
-  const f=$("#cfilter"); f.oninput=()=>{ conFilter=f.value.trim().toLowerCase(); const pos=f.selectionStart; renderConcepts(); const g=$("#cfilter"); g.focus(); g.setSelectionRange(pos,pos); };
+  const empty=$("#conceptEmpty"); if(empty) empty.hidden = shown>0 || !q;
+}
+function setConceptOpen(el, open){
+  const btn=el.querySelector(":scope > h2 > .cacc, :scope > .cacc");
+  const panel=el.querySelector(":scope > .cpanel");
+  btn.setAttribute("aria-expanded", open?"true":"false");
+  panel.classList.toggle("is-open", open);
+  if(open) panel.removeAttribute("inert"); else panel.setAttribute("inert","");
+}
+function renderConcepts(){
+  const C=CT.en, st=conceptState();
+  document.body.classList.toggle("is-zen", st.z);
+  const domains=SYL.map(([id,key,w,skills])=>{
+    const dOpen=st.d.includes(id);
+    const cards=skills.map(s=>{
+      const open=st.s.includes(SK[s].en);
+      const bits=CPART[s].en.map((para,i)=>`<div class="cpart" data-part="${C.parts[i][0]}"><h4>${C.parts[i][1]}</h4><p>${glossLink(para)}</p></div>`).join("");
+      return `<article class="cskill" data-skill="${esc(SK[s].en)}"><button type="button" class="cacc" id="cskillbtn-${s}" aria-expanded="${open}" aria-controls="cskill-${s}"><span class="cname">${esc(SK[s].en)}</span><span class="cwt">${SK[s].w}%</span>${CHEV}</button><div id="cskill-${s}" class="cpanel${open?" is-open":""}" role="region" aria-labelledby="cskillbtn-${s}"${open?"":" inert"}><div class="cpanelin">${bits}</div></div></article>`;
+    }).join("");
+    return `<section class="cdom" data-domain="${id}"><h2><button type="button" class="cacc" id="cdombtn-${id}" aria-expanded="${dOpen}" aria-controls="cdom-${id}"><span class="cname">${id}. ${esc(DOM[key].en)}</span><span class="cwt">${w}%</span>${CHEV}</button></h2><div id="cdom-${id}" class="cpanel${dOpen?" is-open":""}" role="region" aria-labelledby="cdombtn-${id}"${dOpen?"":" inert"}><div class="cpanelin">${cards}</div></div></section>`;
+  }).join("");
+  const gl=GLOSS.map(g=>`<tr data-term="${esc(g[0])}"><td><b>${esc(g[0])}</b></td><td>${esc(g[1].en)}</td></tr>`).join("");
+  $("#panelConcepts").innerHTML=`<div class="concept-read"><section class="page-head"><h2>${C.h}</h2><p class="sub">${C.p}</p></section><div class="concept-tools"><div class="field"><label for="conceptSearch">${C.search}</label><input id="conceptSearch" type="search" value="${esc(conFilter)}" autocomplete="off"></div><button type="button" class="btn ghost" id="conceptExpand">${C.expand}</button><button type="button" class="btn ghost" id="conceptCollapse">${C.collapse}</button><button type="button" class="btn ghost" id="conceptZen" aria-pressed="${st.z}">${st.z?C.zenOff:C.zen}</button></div><p id="conceptEmpty" class="muted" hidden>${C.empty}</p>${domains}<section id="conceptGloss"><h2>${C.gloss}</h2><div class="tablewrap"><table class="skills rules"><tbody>${gl}</tbody></table></div></section></div>`;
+  const root=$("#panelConcepts");
+  $("#conceptSearch").oninput=applyConceptFilter;
+  $("#conceptExpand").onclick=()=>{ root.querySelectorAll(".cdom,.cskill").forEach(el=>setConceptOpen(el,true)); saveConceptOpen(); };
+  $("#conceptCollapse").onclick=()=>{ root.querySelectorAll(".cdom,.cskill").forEach(el=>setConceptOpen(el,false)); saveConceptOpen(); };
+  $("#conceptZen").onclick=()=>{ const on=!document.body.classList.contains("is-zen"); document.body.classList.toggle("is-zen", on); store.set("ccdvf.concepts.zen", on); $("#conceptZen").textContent=on?CT.en.zenOff:CT.en.zen; $("#conceptZen").setAttribute("aria-pressed", on?"true":"false"); };
+  if(!conceptBound){
+    conceptBound=true;
+    root.addEventListener("click", e=>{
+      const g=e.target.closest(".glink");
+      if(g){ const row=[...root.querySelectorAll("#conceptGloss tr")].find(tr=>tr.dataset.term===g.dataset.gloss); if(row) row.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"center"}); return; }
+      const b=e.target.closest(".cacc"); if(!b||!root.contains(b)) return;
+      setConceptOpen(b.closest(".cskill, .cdom"), b.getAttribute("aria-expanded")!=="true");
+      saveConceptOpen();
+    });
+  }
+  applyConceptFilter();
 }
 
 /* ===== textos de las funciones nuevas ===== */
@@ -1839,7 +1960,7 @@ function buildToc(panel){
 }
 function addJump(panel){ buildToc(panel); }
 function spy(){
-  for(const id of ["v-plan","v-con","v-prog"]){
+  for(const id of ["v-plan","panelConcepts","v-prog"]){
     const p=document.getElementById(id); if(!p||p.hidden||!p._toc||!p._toc.secs[0].isConnected) continue;
     const off=(parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||100)+24;
     let cur=p._toc.secs[0];
@@ -1859,9 +1980,10 @@ const HASH = location.hash.replace("#","");
 let TAB = ["plan","conceptos","progreso"].includes(HASH) ? HASH : "examen";
 function show(which){
   TAB=which;
-  [["examen","t-examen","v-examen"],["progreso","t-prog","v-prog"],["plan","t-plan","v-plan"],["conceptos","t-con","v-con"]].forEach(([k,tb,v])=>{ $("#"+tb).setAttribute("aria-selected",k===which); $("#"+v).hidden=k!==which; });
+  if(which!=="conceptos") document.body.classList.remove("is-zen");
+  [["examen","t-examen","v-examen"],["progreso","t-prog","v-prog"],["plan","t-plan","v-plan"],["conceptos","tabConcepts","panelConcepts"]].forEach(([k,tb,v])=>{ $("#"+tb).setAttribute("aria-selected",k===which); $("#"+v).hidden=k!==which; });
   if(which==="plan"){ renderPlan(); addJump($("#v-plan")); }
-  if(which==="conceptos"){ renderConcepts(); addJump($("#v-con")); }
+  if(which==="conceptos"){ renderConcepts(); }
   if(which==="progreso"){ renderProgress(); }
   if(which==="examen" && VIEW!=="q" && VIEW!=="review" && VIEW!=="res") renderHome();
   measureBar(); spy();
@@ -1869,15 +1991,15 @@ function show(which){
 function applyLang(){
   document.documentElement.lang=LANG;
   document.title = LANG==="es" ? "Simulador CCDV‑F" : "CCDV‑F Simulator"; $("#aread").setAttribute("aria-label",t("read")); $("#aread").title=t("read"); $("#brand-t").textContent = LANG==="es" ? "Simulador CCDV‑F" : "CCDV‑F Simulator";
-  $("#t-examen").textContent=t("tabExam"); $("#t-plan").innerHTML=`<span class="lg-only">${t("tabPlan")}</span><span class="sm-only">${t("planShort")}</span>`; $("#t-con").textContent=CT[LANG].tab; $("#t-prog").textContent=ft("tabProg"); measureBar();
+  $("#t-examen").textContent=t("tabExam"); $("#t-plan").innerHTML=`<span class="lg-only">${t("tabPlan")}</span><span class="sm-only">${t("planShort")}</span>`; $("#tabConcepts").textContent=CT.en.tab; $("#t-prog").textContent=ft("tabProg"); measureBar();
   document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===LANG));
   if(VIEW==="q"&&S&&!S.finished) renderQuestion(); else if(VIEW==="review"&&S) renderReview(); else if(VIEW==="res"&&S) renderResults(); else renderHome();
-  if(TAB==="plan"){ renderPlan(); addJump($("#v-plan")); } if(TAB==="conceptos"){ renderConcepts(); addJump($("#v-con")); } if(TAB==="progreso"){ renderProgress(); }
+  if(TAB==="plan"){ renderPlan(); addJump($("#v-plan")); } if(TAB==="conceptos"){ renderConcepts(); } if(TAB==="progreso"){ renderProgress(); }
 }
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{ if(LANG!==b.dataset.lang){ LANG=b.dataset.lang; store.set("ccdvf-lang",LANG); applyLang(); } });
 $("#t-examen").onclick=()=>show("examen");
 $("#t-plan").onclick=()=>show("plan");
-$("#t-con").onclick=()=>show("conceptos");
+$("#tabConcepts").onclick=()=>show("conceptos");
 $("#t-prog").onclick=()=>show("progreso");
 $("#aread").onclick=e=>{ e.stopPropagation(); readingMenu($("#aread")); };
 window.addEventListener("pagehide", ()=>{ saveAttempt(); saveLive(); });
